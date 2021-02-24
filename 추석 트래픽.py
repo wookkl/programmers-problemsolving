@@ -1,24 +1,25 @@
+def get_milli_seconds(t):
+    h, m, s = map(float, t.split(":"))
+    return int(1000 * (h * 3600 + m * 60 + s))
+
+
 def solution(lines):
-    res = 0
-    time_slot=[]
-    times=[]
-    for log in lines:
-        date,s,t=log.split(' ')
-        h,m,s=s.split(':')
-        back=int(h)*3600000+int(m)*60000+int(float(s)*1000)
-        t=int(float(t[:-1])*1000)
-        front=back-t+1
-        time_slot.append([front,back])
-        times.append(front)
-        times.append(back)
-    times.sort()
-    for front in times:
-        back = front +999
-        cnt=0
-        for f,b in time_slot:
-            if front<=f<=back or front <= b <= back:
-                cnt+=1
-            elif f<=front and back<=b:
-                cnt+=1
-        res=max(cnt,res)
-    return res
+    answer = 0
+    times = []
+    for idx, line in enumerate(lines):
+        _, s, t = line.split(" ")
+        s = get_milli_seconds(s)
+        t = int(float(t.replace('s', ''))*1000)
+        start = s - t + 1
+        end = s
+        lines[idx] = [start, end]
+        times.extend([start, end])
+    times = sorted(list(set(times)))
+
+    for t in times:
+        c = 0
+        for s, e in lines:
+            if t - 999 <= e and s <= t:
+                c += 1
+        answer = max(c, answer)
+    return answer
